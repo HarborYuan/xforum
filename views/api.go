@@ -12,8 +12,8 @@ import (
 	Signup is a function that handles users' register requests.
 	{
 		"email" : "example@example.com",
-		"password" : "password",
 		"username" : "Bob",
+		"password" : "password",
 		"gender" : 0,
 		"birthday" : "2001-01-01"
 	}
@@ -21,8 +21,8 @@ import (
 // Haobo : Auto generated from https://mholt.github.io/json-to-go/
 type JsonSignup struct {
 	Email    string `json:"email"`
-	Password string `json:"password"`
 	Username string `json:"username"`
+	Password string `json:"password"`
 	Gender   int    `json:"gender"`
 	Birthday string `json:"birthday"`
 }
@@ -42,7 +42,7 @@ func Sinup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	flag := dbop.AddUser(
-		"123",
+		info.Username,
 		info.Username,
 		info.Password,
 		info.Email,
