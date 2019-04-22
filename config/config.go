@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-//Haobo : Auto generated from https://mholt.github.io/json-to-go/
+// Haobo : Auto generated from https://mholt.github.io/json-to-go/
 type Configuration struct {
 	Listen struct {
 		ServerAddr string `json:"ServerAddr"`

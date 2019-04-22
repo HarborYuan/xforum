@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	// sqlite driver for go
+	// Sqlite driver for go
 	_ "github.com/mattn/go-sqlite3"
 )
 
