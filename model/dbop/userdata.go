@@ -17,24 +17,23 @@ const (
 )
 
 // AddUser add user
-func AddUser(uid, username, password, email, phone, birthdate, gender string) bool {
+func AddUser(username, password, email, phone, birthdate, gender string) bool {
 	defer printErr()
 	db, err := sql.Open(sqlDriver, userDataPath)
 	checkErr(err)
 	defer db.Close()
-	stmt, err := db.Prepare(`INSERT INTO userinfo(uid, 
-												  username, 
+	stmt, err := db.Prepare(`INSERT INTO userinfo(username, 
 												  password, 
 												  email, 
 												  phone, 
 												  birthdate, 
 												  createtime, 
-												  gender) values (?, ?, ?, ?, ?, ?, ?, ?)`)
+												  gender) values (?, ?, ?, ?, ?, ?, ?)`)
 	checkErr(err)
 	createtime := time.Now().Format("2006-01-02 15:04:05")
 	tx, err := db.Begin()
 	checkErr(err)
-	_, err = tx.Stmt(stmt).Exec(uid, username, password, email, phone, birthdate, createtime, gender)
+	_, err = tx.Stmt(stmt).Exec(username, password, email, phone, birthdate, createtime, gender)
 	if err != nil {
 		tx.Rollback()
 		panic(err)

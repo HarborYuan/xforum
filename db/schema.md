@@ -11,7 +11,7 @@ userdata.db
 -- 创建时间 YYYY-MM-DD HH:MM:SS
 -- 权限* 待定
 CREATE TABLE userinfo (
-    uid INTEGER PRIMARY KEY NOT NULL,
+    uid INTEGER PRIMARY KEY,
     username TEXT NOT NULL,
     password TEXT NOT NULL,
     email TEXT NOT NULL,
