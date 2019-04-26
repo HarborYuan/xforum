@@ -12,5 +12,5 @@
 *.out
 
 # IDEA should be ignored
-.idea/
+.idea
 
