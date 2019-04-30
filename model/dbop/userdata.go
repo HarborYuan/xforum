@@ -2,6 +2,7 @@ package dbop
 
 import (
 	"database/sql"
+	"github.com/HarborYuan/xforum/model/util"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"time"
@@ -113,7 +114,7 @@ func AddUser(username, password, email, birthdate, gender string) string {
 		return "U103"
 	}
 
-	_, err = tx.Stmt(stmt).Exec(username, password, email, birthdate, createtime, gender)
+	_, err = tx.Stmt(stmt).Exec(username, util.Sha(password), email, birthdate, createtime, gender)
 	if err != nil {
 		_ = tx.Rollback()
 		log.Print(err)
@@ -121,6 +122,44 @@ func AddUser(username, password, email, birthdate, gender string) string {
 	}
 	_ = tx.Commit()
 	return "U100"
+}
+
+// CheckPass have the following return codes :
+// C100-1 : OK
+// C100-0 : Wrong password
+// C101 : Cannot connect to the database.
+// C102 : SQL statement error
+// C103 : SQL execution error
+// C104 : No user
+func CheckPass(username, password string) string {
+	db, err := sql.Open(sqlDriver, userDataPath)
+	if err != nil {
+		log.Print(err)
+		return "C101"
+	}
+	defer func() {
+		_ = db.Close()
+	}()
+	stmtUsername, err := db.Prepare(`SELECT password FROM userinfo WHERE username = ?`)
+	if err != nil {
+		log.Print(err)
+		return "C102"
+	}
+	defer func() {
+		_ = stmtUsername.Close()
+	}()
+	var name string
+	err = stmtUsername.QueryRow(username).Scan(&name)
+	if err == sql.ErrNoRows {
+		return "C104"
+	} else if err != nil {
+		log.Print(err)
+		return "C103"
+	}
+	if name == util.Sha(password) {
+		return "C100-1"
+	}
+	return "C100-0"
 }
 
 //// DelUser delete user using uid

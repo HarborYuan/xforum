@@ -135,5 +135,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 		return
 	}
-	/* TODO : finish it */
+	flag := dbop.CheckPass(info.Username, info.Password)
+	_, err = w.Write([]byte(flag))
 }
