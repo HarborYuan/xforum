@@ -47,11 +47,6 @@ func Sinup(w http.ResponseWriter, r *http.Request) {
 		info.Email,
 		info.Birthday,
 		string(info.Gender))
-
-	if flag != "U100" {
-		http.Error(w, flag, 500)
-		return
-	}
 	_, err = w.Write([]byte(flag))
 }
 
@@ -81,10 +76,6 @@ func CheckUsername(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	flag := dbop.CheckUsername(info.Username)
-	if flag[0:4] != "C100" {
-		http.Error(w, flag, 500)
-		return
-	}
 	_, err = w.Write([]byte(flag))
 }
 
@@ -114,10 +105,6 @@ func CheckEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	flag := dbop.CheckEmail(info.Email)
-	if flag[0:4] != "C100" {
-		http.Error(w, flag, 500)
-		return
-	}
 	_, err = w.Write([]byte(flag))
 }
 
