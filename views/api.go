@@ -3,10 +3,14 @@ package views
 import (
 	"encoding/json"
 	"github.com/HarborYuan/xforum/model/dbop"
+	"github.com/gorilla/sessions"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
+
+// Gorilla session initiate
+var Store *sessions.CookieStore
 
 /*
 	Signup is a function that handles users' register requests.
@@ -122,6 +126,15 @@ type JsonLogin struct {
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
+	session, err := Store.Get(r, "session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if session.Values["loggedin"] == "true" {
+		_, _ = w.Write([]byte("Don't login anymore"))
+		return
+	}
 	var info JsonLogin
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -136,5 +149,26 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	flag := dbop.CheckPass(info.Username, info.Password)
+	if flag == "C100-1" {
+		session.Values["loggedin"] = "true"
+		session.Values["username"] = info.Username
+		_ = session.Save(r, w)
+	}
 	_, err = w.Write([]byte(flag))
+}
+
+func Logout(w http.ResponseWriter, r *http.Request) {
+	session, err := Store.Get(r, "session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if session.Values["loggedin"] == "false" {
+		_, _ = w.Write([]byte("You cannot logout!"))
+		return
+	}
+	session.Values["loggedin"] = "false"
+	session.Values["username"] = ""
+	_ = session.Save(r, w)
+	_, err = w.Write([]byte("Success"))
 }

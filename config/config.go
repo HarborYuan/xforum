@@ -12,6 +12,7 @@ type Configuration struct {
 		ServerAddr string `json:"ServerAddr"`
 		ServerPort string `json:"ServerPort"`
 	} `json:"Listen"`
+	SessionKey string `json:"session-key"`
 }
 
 var Config Configuration
