@@ -19,3 +19,20 @@ CREATE TABLE userinfo (
     createtime TEXT NOT NULL,
     gender TEXT);
 ```
+
+```
+--帖子id
+--用户id
+--创建时间
+--内容
+--路径
+
+CREATE TABLE posts
+(
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    uid        INTEGER,
+    createtime TEXT NOT NULL,
+    content    TEXT NOT NULL,
+    path       TEXT NOT NULL
+);
+```
