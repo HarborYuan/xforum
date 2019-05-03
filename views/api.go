@@ -132,7 +132,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if session.Values["loggedin"] == "true" {
-		_, _ = w.Write([]byte("Don't login anymore"))
+		_, _ = w.Write([]byte("U200"))
 		return
 	}
 	var info JsonLogin
@@ -164,11 +164,11 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if session.Values["loggedin"] == "false" {
-		_, _ = w.Write([]byte("You cannot logout!"))
+		_, _ = w.Write([]byte("U200"))
 		return
 	}
 	session.Values["loggedin"] = "false"
 	session.Values["username"] = ""
 	_ = session.Save(r, w)
-	_, err = w.Write([]byte("Success"))
+	_, err = w.Write([]byte("U100"))
 }
