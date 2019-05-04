@@ -2,15 +2,27 @@ package dbop
 
 import (
 	"database/sql"
+	"encoding/json"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 )
+
+type Posts struct {
+	Uid        int    `json:"uid"`
+	Createtime string `json:"createtime"`
+	Content    string `json:"content"`
+}
+
+type AllPosts struct {
+	Posts []Posts `json:"posts"`
+}
 
 // G101 : Cannot connect to DB
 // G102 : SQL statement error
 // G103 : SQL exe error
 // G104 : empty
-func getPosts(path string) string {
+// G105 : JSON error
+func GetPosts(path string) string {
 	db, err := sql.Open(sqlDriver, userDataPath)
 	if err != nil {
 		log.Print(err)
@@ -27,13 +39,36 @@ func getPosts(path string) string {
 	defer func() {
 		_ = stmtUsername.Close()
 	}()
-	var name string
-	err = stmtUsername.QueryRow(path).Scan(&name)
+	rows, err := stmtUsername.Query(path)
 	if err == sql.ErrNoRows {
 		return "G104"
 	} else if err != nil {
 		log.Print(err)
 		return "G103"
 	}
-	return name
+	var result AllPosts
+	defer rows.Close()
+	for rows.Next() {
+		var uid int
+		var createtime, content string
+		err = rows.Scan(&uid, &createtime, &content)
+		if err != nil {
+			log.Print(err)
+			return "Unkonwn Error"
+		}
+		result.Posts = append(result.Posts, Posts{Uid: uid, Createtime: createtime, Content: content})
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Print(err)
+		return "Unkonwn Error"
+	}
+
+	res, err := json.Marshal(result)
+	log.Print(result)
+	if err != nil {
+		log.Print(err)
+		return "G105"
+	}
+	return string(res)
 }

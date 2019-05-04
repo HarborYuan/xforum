@@ -163,7 +163,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if session.Values["loggedin"] == "false" {
+	if session.Values["loggedin"] != "true" {
 		_, _ = w.Write([]byte("U200"))
 		return
 	}
