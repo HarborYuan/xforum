@@ -85,5 +85,5 @@ Return Code:
 JSON
 
     {
-        path : "/"
+        path : "index"
     }

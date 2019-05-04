@@ -19,6 +19,8 @@ func Handler() {
 	http.HandleFunc("/api/login/", views.Login)
 	http.HandleFunc("/api/logout/", views.Logout)
 	http.HandleFunc("/api/getposts/", views.GetPosts)
+	http.HandleFunc("/api/getboards/", views.GetBoards)
+	http.HandleFunc("/api/getresponse/", views.GetResponse)
 
 	//Handle favicon.ico
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {

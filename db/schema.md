@@ -1,6 +1,6 @@
 userdata.db
 
-```
+```Sqlite
 -- 用户id
 -- 用户名
 -- 密码
@@ -20,7 +20,7 @@ CREATE TABLE userinfo (
     gender TEXT);
 ```
 
-```
+```Sqlite
 --帖子id
 --用户id
 --创建时间
@@ -34,5 +34,34 @@ CREATE TABLE posts
     createtime TEXT NOT NULL,
     content    TEXT NOT NULL,
     path       TEXT NOT NULL
+);
+```
+
+```Sqlite
+---板块id
+---板块名称
+---板块路径
+
+CREATE TABLE boards
+(
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    name       TEXT NOT NULL,
+    path       TEXT NOT NULL UNIQUE
+);
+```
+
+```Sqlite
+---回复id
+---用户id
+---帖子id
+---创建时间
+---内容
+CREATE TABLE response
+(
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    uid        INTEGER,
+    pid        INTEGER,
+    createtime TEXT NOT NULL,
+    content    TEXT NOT NULL
 );
 ```
