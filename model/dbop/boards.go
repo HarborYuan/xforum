@@ -9,6 +9,7 @@ import (
 )
 
 type Posts struct {
+	Pid        int    `json:"pid"`
 	Uid        int    `json:"uid"`
 	Createtime string `json:"createtime"`
 	Content    string `json:"content"`
@@ -32,7 +33,7 @@ func GetPosts(path string) string {
 	defer func() {
 		_ = db.Close()
 	}()
-	stmtUsername, err := db.Prepare(`SELECT uid,createtime,content  FROM posts WHERE path = ?`)
+	stmtUsername, err := db.Prepare(`SELECT id,uid,createtime,content  FROM posts WHERE path = ?`)
 	if err != nil {
 		log.Print(err)
 		return "G102"
@@ -50,14 +51,14 @@ func GetPosts(path string) string {
 	var result AllPosts
 	defer rows.Close()
 	for rows.Next() {
-		var uid int
+		var pid, uid int
 		var createtime, content string
-		err = rows.Scan(&uid, &createtime, &content)
+		err = rows.Scan(&pid, &uid, &createtime, &content)
 		if err != nil {
 			log.Print(err)
 			return "Unkonwn Error"
 		}
-		result.Posts = append(result.Posts, Posts{Uid: uid, Createtime: createtime, Content: content})
+		result.Posts = append(result.Posts, Posts{Pid: pid, Uid: uid, Createtime: createtime, Content: content})
 	}
 	err = rows.Err()
 	if err != nil {
@@ -66,7 +67,6 @@ func GetPosts(path string) string {
 	}
 
 	res, err := json.Marshal(result)
-	log.Print(result)
 	if err != nil {
 		log.Print(err)
 		return "G105"
