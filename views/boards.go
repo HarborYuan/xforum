@@ -191,3 +191,53 @@ func AddPost(w http.ResponseWriter, r *http.Request) {
 	flag := dbop.AddPost(info.Content, info.Path, userid)
 	_, err = w.Write([]byte(flag))
 }
+
+/*
+	{
+		"pid" : 1,
+		"content" : "今天我也刷题了，求夸"
+	}
+*/
+
+type JsonAddResponse struct {
+	Pid     int    `json:"pid"`
+	Content string `json:"content"`
+}
+
+func AddResponse(w http.ResponseWriter, r *http.Request) {
+	session, err := Store.Get(r, "session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if session.Values["loggedin"] != "true" {
+		_, _ = w.Write([]byte("U200"))
+		return
+	}
+	var info JsonAddResponse
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	// Unmarshal
+	err = json.Unmarshal(b, &info)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		log.Print(err)
+		return
+	}
+	username := session.Values["username"]
+	strusername := fmt.Sprint(username)
+	userid := dbop.GetUid(strusername)
+	if userid == -1 {
+		_, err = w.Write([]byte("R105"))
+		return
+	}
+	if dbop.IsExistPid(info.Pid) != 1 {
+		_, err = w.Write([]byte("R106"))
+		return
+	}
+	flag := dbop.AddResponse(userid, info.Pid, info.Content)
+	_, err = w.Write([]byte(flag))
+}

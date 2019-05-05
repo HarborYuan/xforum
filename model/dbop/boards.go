@@ -248,7 +248,7 @@ func AddBoard(name, path string) string {
 // B100 : success
 // B101 : Cannot connect to DB
 // B102 : sql statement error
-// B103 : Unable to get DB handle
+// B103 : Unable to get DB handler
 // B104 : sql exe error
 // B105 : user invalid
 func AddPost(content, path string, uid int) string {
@@ -285,4 +285,75 @@ func AddPost(content, path string, uid int) string {
 	}
 	_ = tx.Commit()
 	return "B100"
+}
+
+// R100 : success
+// R101 : Cannot connect to DB
+// R102 : sql statement error
+// R103 : Unable to get DB handler
+// R104 : sql exe error
+// R105 : user invalid
+// R106 : No such pid
+func AddResponse(uid, pid int, content string) string {
+	// Open database
+	db, err := sql.Open(sqlDriver, userDataPath)
+	if err != nil {
+		log.Print(err)
+		return "R101"
+	}
+	defer func() {
+		_ = db.Close()
+	}()
+
+	// Prepare for statement
+	stmt, err := db.Prepare(`INSERT INTO response (uid, pid, createtime, content) values (?, ?, ?, ?)`)
+	if err != nil {
+		log.Print(err)
+		return "R102"
+	}
+
+	createtime := time.Now().Format("2006-01-02 15:04:05")
+
+	tx, err := db.Begin()
+	if err != nil {
+		log.Print(err)
+		return "R103"
+	}
+
+	_, err = tx.Stmt(stmt).Exec(uid, pid, createtime, content)
+	if err != nil {
+		_ = tx.Rollback()
+		log.Print(err)
+		return "R104"
+	}
+	_ = tx.Commit()
+	return "R100"
+}
+
+func IsExistPid(pid int) int {
+	db, err := sql.Open(sqlDriver, userDataPath)
+	if err != nil {
+		log.Print(err)
+		return -1
+	}
+	defer func() {
+		_ = db.Close()
+	}()
+	stmtUsername, err := db.Prepare(`SELECT id FROM posts WHERE id = ?`)
+	if err != nil {
+		log.Print(err)
+		return -1
+	}
+	defer func() {
+		_ = stmtUsername.Close()
+	}()
+	var res int
+	err = stmtUsername.QueryRow(pid).Scan(&res)
+	if err == sql.ErrNoRows {
+		return 0
+	} else if err != nil {
+		log.Print(err)
+		return -1
+	}
+	return 1
 }
