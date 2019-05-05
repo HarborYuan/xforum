@@ -50,7 +50,9 @@ func GetPosts(path string) string {
 	}
 	var result AllPosts
 	defer rows.Close()
+	isNotEmpty := false
 	for rows.Next() {
+		isNotEmpty = true
 		var pid, uid int
 		var createtime, content string
 		err = rows.Scan(&pid, &uid, &createtime, &content)
@@ -59,6 +61,9 @@ func GetPosts(path string) string {
 			return "Unkonwn Error"
 		}
 		result.Posts = append(result.Posts, Posts{Pid: pid, Uid: uid, Createtime: createtime, Content: content})
+	}
+	if !isNotEmpty {
+		return "G104"
 	}
 	err = rows.Err()
 	if err != nil {
@@ -114,7 +119,9 @@ func GetBoards() string {
 	}
 	var result Boards
 	defer rows.Close()
+	isNotEmpty := false
 	for rows.Next() {
+		isNotEmpty = true
 		var name, path string
 		err = rows.Scan(&name, &path)
 		if err != nil {
@@ -122,6 +129,9 @@ func GetBoards() string {
 			return "Unkonwn Error"
 		}
 		result.Board = append(result.Board, Board{Name: name, Path: path})
+	}
+	if !isNotEmpty {
+		return "G104"
 	}
 	err = rows.Err()
 	if err != nil {
@@ -179,16 +189,20 @@ func GetResponse(pid int) string {
 	}
 	var result Responses
 	defer rows.Close()
+	isNotEmpty := false
 	for rows.Next() {
+		isNotEmpty = true
 		var uid int
 		var createtime, content string
 		err = rows.Scan(&uid, &createtime, &content)
-		log.Print(uid)
 		if err != nil {
 			log.Print(err)
 			return "Unkonwn Error"
 		}
 		result.Response = append(result.Response, Response{Uid: uid, Createtime: createtime, Content: content})
+	}
+	if !isNotEmpty {
+		return "G104"
 	}
 	err = rows.Err()
 	if err != nil {
