@@ -105,3 +105,43 @@ func GetResponse(w http.ResponseWriter, r *http.Request) {
 	flag := dbop.GetResponse(info.Pid)
 	_, err = w.Write([]byte(flag))
 }
+
+/*
+	{
+		"name" : "体育",
+		"path" : "pe"
+	}
+*/
+// ! ---- Admin required  ---- !
+// ########## must be modified when deploy
+type JsonAddBoards struct {
+	Name string `json:"name"`
+	Path string `json:"path"`
+}
+
+func AddBoards(w http.ResponseWriter, r *http.Request) {
+	session, err := Store.Get(r, "session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if session.Values["loggedin"] != "true" /*|| session.Values["isAdmin"] != "true" */ {
+		_, _ = w.Write([]byte("U200"))
+		return
+	}
+	var info JsonAddBoards
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	// Unmarshal
+	err = json.Unmarshal(b, &info)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		log.Print(err)
+		return
+	}
+	flag := dbop.AddBoard(info.Name, info.Path)
+	_, err = w.Write([]byte(flag))
+}

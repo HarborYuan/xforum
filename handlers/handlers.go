@@ -21,6 +21,7 @@ func Handler() {
 	http.HandleFunc("/api/getposts/", views.GetPosts)
 	http.HandleFunc("/api/getboards/", views.GetBoards)
 	http.HandleFunc("/api/getresponse/", views.GetResponse)
+	http.HandleFunc("/api/addboards/", views.AddBoards)
 
 	//Handle favicon.ico
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
