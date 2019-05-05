@@ -172,3 +172,42 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	_ = session.Save(r, w)
 	_, err = w.Write([]byte("U100"))
 }
+
+/*
+	GetUserInfo is a function that xxxxxxxxxxxxxxxxxx
+	{
+		"uid" : 1
+	}
+*/
+// Haobo : Auto generated from https://mholt.github.io/json-to-go/
+
+type JsonGetUserInfo struct {
+	UID int `json:"uid"`
+}
+
+func GetUserInfo(w http.ResponseWriter, r *http.Request) {
+	session, err := Store.Get(r, "session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if session.Values["loggedin"] != "true" {
+		_, _ = w.Write([]byte("U200"))
+		return
+	}
+	var info JsonGetUserInfo
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	// Unmarshal
+	err = json.Unmarshal(b, &info)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		log.Print(err)
+		return
+	}
+	flag := dbop.GetUserInfo(info.UID)
+	_, err = w.Write([]byte(flag))
+}
