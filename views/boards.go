@@ -2,6 +2,7 @@ package views
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/HarborYuan/xforum/model/dbop"
 	"io/ioutil"
 	"log"
@@ -143,5 +144,50 @@ func AddBoards(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	flag := dbop.AddBoard(info.Name, info.Path)
+	_, err = w.Write([]byte(flag))
+}
+
+/*
+	{
+		"path" : "pe",
+		"content" : "我今天刷题了，求夸"
+	}
+*/
+type JsonAddPost struct {
+	Path    string `json:"path"`
+	Content string `json:"content"`
+}
+
+func AddPost(w http.ResponseWriter, r *http.Request) {
+	session, err := Store.Get(r, "session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if session.Values["loggedin"] != "true" {
+		_, _ = w.Write([]byte("U200"))
+		return
+	}
+	var info JsonAddPost
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	// Unmarshal
+	err = json.Unmarshal(b, &info)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		log.Print(err)
+		return
+	}
+	username := session.Values["username"]
+	strusername := fmt.Sprint(username)
+	userid := dbop.GetUid(strusername)
+	if userid == -1 {
+		_, err = w.Write([]byte("B105"))
+		return
+	}
+	flag := dbop.AddPost(info.Content, info.Path, userid)
 	_, err = w.Write([]byte(flag))
 }

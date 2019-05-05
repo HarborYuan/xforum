@@ -162,6 +162,32 @@ func CheckPass(username, password string) string {
 	return "C100-0"
 }
 
+func GetUid(name string) int {
+	db, err := sql.Open(sqlDriver, userDataPath)
+	if err != nil {
+		log.Print(err)
+		return -1
+	}
+	defer func() {
+		_ = db.Close()
+	}()
+	stmtUsername, err := db.Prepare(`SELECT uid FROM userinfo WHERE username = ?`)
+	if err != nil {
+		log.Print(err)
+		return -1
+	}
+	defer func() {
+		_ = stmtUsername.Close()
+	}()
+	var res int
+	err = stmtUsername.QueryRow(name).Scan(&res)
+	if err != nil {
+		log.Print(err)
+		return -1
+	}
+	return res
+}
+
 //// DelUser delete user using uid
 //func DelUser(uid string) bool {
 //	defer printErr()

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
+	"time"
 )
 
 type Posts struct {
@@ -235,6 +236,48 @@ func AddBoard(name, path string) string {
 	}
 
 	_, err = tx.Stmt(stmt).Exec(name, path)
+	if err != nil {
+		_ = tx.Rollback()
+		log.Print(err)
+		return "B104"
+	}
+	_ = tx.Commit()
+	return "B100"
+}
+
+// B100 : success
+// B101 : Cannot connect to DB
+// B102 : sql statement error
+// B103 : Unable to get DB handle
+// B104 : sql exe error
+// B105 : user invalid
+func AddPost(content, path string, uid int) string {
+	// Open database
+	db, err := sql.Open(sqlDriver, userDataPath)
+	if err != nil {
+		log.Print(err)
+		return "B101"
+	}
+	defer func() {
+		_ = db.Close()
+	}()
+
+	// Prepare for statement
+	stmt, err := db.Prepare(`INSERT INTO posts (uid, createtime, content, path) values (?, ?, ?, ?)`)
+	if err != nil {
+		log.Print(err)
+		return "B102"
+	}
+
+	createtime := time.Now().Format("2006-01-02 15:04:05")
+
+	tx, err := db.Begin()
+	if err != nil {
+		log.Print(err)
+		return "B103"
+	}
+
+	_, err = tx.Stmt(stmt).Exec(uid, createtime, content, path)
 	if err != nil {
 		_ = tx.Rollback()
 		log.Print(err)
