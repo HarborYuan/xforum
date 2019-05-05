@@ -183,6 +183,7 @@ func GetResponse(pid int) string {
 		var uid int
 		var createtime, content string
 		err = rows.Scan(&uid, &createtime, &content)
+		log.Print(uid)
 		if err != nil {
 			log.Print(err)
 			return "Unkonwn Error"
@@ -196,7 +197,6 @@ func GetResponse(pid int) string {
 	}
 
 	res, err := json.Marshal(result)
-	log.Print(result)
 	if err != nil {
 		log.Print(err)
 		return "G105"
