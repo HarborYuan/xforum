@@ -237,6 +237,34 @@ func GetUserInfo(id int) string {
 	return string(res)
 }
 
+func getUserName(id int) string {
+	db, err := sql.Open(sqlDriver, userDataPath)
+	if err != nil {
+		log.Print(err)
+		return "@"
+	}
+	defer func() {
+		_ = db.Close()
+	}()
+	stmtUsername, err := db.Prepare(`SELECT username FROM userinfo WHERE uid = ?`)
+	if err != nil {
+		log.Print(err)
+		return "@"
+	}
+	defer func() {
+		_ = stmtUsername.Close()
+	}()
+	var username string
+	err = stmtUsername.QueryRow(id).Scan(&username)
+	if err == sql.ErrNoRows {
+		return "!"
+	} else if err != nil {
+		log.Print(err)
+		return "@"
+	}
+	return string(username)
+}
+
 //// DelUser delete user using uid
 //func DelUser(uid string) bool {
 //	defer printErr()

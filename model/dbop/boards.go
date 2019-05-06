@@ -11,6 +11,7 @@ import (
 type Posts struct {
 	Pid        int    `json:"pid"`
 	Uid        int    `json:"uid"`
+	Username   string `json:"username"`
 	Createtime string `json:"createtime"`
 	Content    string `json:"content"`
 }
@@ -58,9 +59,15 @@ func GetPosts(path string) string {
 		err = rows.Scan(&pid, &uid, &createtime, &content)
 		if err != nil {
 			log.Print(err)
-			return "Unkonwn Error"
+			return "Unknown Error"
 		}
-		result.Posts = append(result.Posts, Posts{Pid: pid, Uid: uid, Createtime: createtime, Content: content})
+		theUserName := getUserName(uid)
+		if theUserName == "@" {
+			return "Unknown Error"
+		} else if theUserName == "!" {
+			return "G103"
+		}
+		result.Posts = append(result.Posts, Posts{Pid: pid, Uid: uid, Username: theUserName, Createtime: createtime, Content: content})
 	}
 	if !isNotEmpty {
 		return "G104"
@@ -68,7 +75,7 @@ func GetPosts(path string) string {
 	err = rows.Err()
 	if err != nil {
 		log.Print(err)
-		return "Unkonwn Error"
+		return "Unknown Error"
 	}
 
 	res, err := json.Marshal(result)
@@ -149,6 +156,7 @@ func GetBoards() string {
 
 type Response struct {
 	Uid        int    `json:"uid"`
+	Username   string `json:"username"`
 	Createtime string `json:"createtime"`
 	Content    string `json:"content"`
 }
@@ -199,7 +207,13 @@ func GetResponse(pid int) string {
 			log.Print(err)
 			return "Unkonwn Error"
 		}
-		result.Response = append(result.Response, Response{Uid: uid, Createtime: createtime, Content: content})
+		theUserName := getUserName(uid)
+		if theUserName == "@" {
+			return "Unknown Error"
+		} else if theUserName == "!" {
+			return "G103"
+		}
+		result.Response = append(result.Response, Response{Uid: uid, Username: theUserName, Createtime: createtime, Content: content})
 	}
 	if !isNotEmpty {
 		return "G104"
