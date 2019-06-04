@@ -237,6 +237,57 @@ func GetUserInfo(id int) string {
 	return string(res)
 }
 
+type UserDetailInfo struct {
+	Uid        int    `json:"uid"`
+	Username   string `json:"username"`
+	Email      string `json:"email"`
+	Birthdate  string `json:"birthdate"`
+	Createtime string `json:"createtime"`
+	Gender     string `json:"gender"`
+}
+
+// G101 : Cannot connect to DB
+// G102 : SQL statement error
+// G103 : SQL exe error
+// G104 : empty
+// G105 : JSON error
+func GetUserDetailInfo(id int) string {
+	db, err := sql.Open(sqlDriver, userDataPath)
+	if err != nil {
+		log.Print(err)
+		return "G101"
+	}
+	defer func() {
+		_ = db.Close()
+	}()
+	stmtUsername, err := db.Prepare(`SELECT uid, username, email, birthdate, createtime, gender FROM userinfo WHERE uid = ?`)
+	if err != nil {
+		log.Print(err)
+		return "G102"
+	}
+	defer func() {
+		_ = stmtUsername.Close()
+	}()
+	var uid int
+	var username, email, birthdate, createtime, gender string
+	err = stmtUsername.QueryRow(id).Scan(&uid, &username, &email, &birthdate, &createtime, &gender)
+	if err == sql.ErrNoRows {
+		return "G104"
+	} else if err != nil {
+		log.Print(err)
+		return "G103"
+	}
+
+	var result UserDetailInfo
+	result = UserDetailInfo{Uid: uid, Username: username, Email: email, Birthdate: birthdate, Createtime: createtime, Gender: gender}
+	res, err := json.Marshal(result)
+	if err != nil {
+		log.Print(err)
+		return "G105"
+	}
+	return string(res)
+}
+
 func getUserName(id int) string {
 	db, err := sql.Open(sqlDriver, userDataPath)
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 // Gorilla session initiate
@@ -50,7 +51,7 @@ func Sinup(w http.ResponseWriter, r *http.Request) {
 		info.Password,
 		info.Email,
 		info.Birthday,
-		string(info.Gender))
+		strconv.Itoa(info.Gender))
 	_, err = w.Write([]byte(flag))
 }
 
@@ -209,5 +210,37 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	flag := dbop.GetUserInfo(info.UID)
+	_, err = w.Write([]byte(flag))
+}
+
+/*
+	{
+		"uid" : 1
+	}
+*/
+func GetUserDetailInfo(w http.ResponseWriter, r *http.Request) {
+	session, err := Store.Get(r, "session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if session.Values["loggedin"] != "true" {
+		_, _ = w.Write([]byte("U200"))
+		return
+	}
+	var info JsonGetUserInfo
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	// Unmarshal
+	err = json.Unmarshal(b, &info)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		log.Print(err)
+		return
+	}
+	flag := dbop.GetUserDetailInfo(info.UID)
 	_, err = w.Write([]byte(flag))
 }

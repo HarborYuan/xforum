@@ -25,6 +25,7 @@ func Handler() {
 	http.HandleFunc("/api/addposts/", views.AddPost)
 	http.HandleFunc("/api/addresponse/", views.AddResponse)
 	http.HandleFunc("/api/getuserinfo/", views.GetUserInfo)
+	http.HandleFunc("/api/getuserdetailinfo/", views.GetUserDetailInfo)
 	http.HandleFunc("/api/isloggedin/", views.IsLoggedIn)
 
 	//Handle favicon.ico
