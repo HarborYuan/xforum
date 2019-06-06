@@ -61,7 +61,7 @@ func GetPosts(path string) string {
 			log.Print(err)
 			return "Unknown Error"
 		}
-		theUserName := getUserName(uid)
+		theUserName := GetUserName(uid)
 		if theUserName == "@" {
 			return "Unknown Error"
 		} else if theUserName == "!" {
@@ -207,7 +207,7 @@ func GetResponse(pid int) string {
 			log.Print(err)
 			return "Unkonwn Error"
 		}
-		theUserName := getUserName(uid)
+		theUserName := GetUserName(uid)
 		if theUserName == "@" {
 			return "Unknown Error"
 		} else if theUserName == "!" {

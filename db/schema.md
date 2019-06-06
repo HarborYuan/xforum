@@ -5,7 +5,6 @@ userdata.db
 -- 用户名
 -- 密码
 -- 电子邮件
--- 电话号码 13位数字
 -- 出生日期 YYYY-MM-DD
 -- 性别 M/F
 -- 创建时间 YYYY-MM-DD HH:MM:SS
@@ -63,5 +62,22 @@ CREATE TABLE response
     pid        INTEGER,
     createtime TEXT NOT NULL,
     content    TEXT NOT NULL
+);
+```
+
+
+```Sqlite
+---私信id
+---发送者id
+---接收者id
+---时间
+---内容
+CREATE TABLE  message
+(
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    sender      INTEGER,
+    sendee      INTEGER,
+    createtime  TEXT NOT NULL,
+    content     TEXT NOT NULL 
 );
 ```

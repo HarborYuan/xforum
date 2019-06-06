@@ -288,7 +288,7 @@ func GetUserDetailInfo(id int) string {
 	return string(res)
 }
 
-func getUserName(id int) string {
+func GetUserName(id int) string {
 	db, err := sql.Open(sqlDriver, userDataPath)
 	if err != nil {
 		log.Print(err)
