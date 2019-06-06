@@ -28,6 +28,7 @@ func Handler() {
 	http.HandleFunc("/api/getuserdetailinfo/", views.GetUserDetailInfo)
 	http.HandleFunc("/api/isloggedin/", views.IsLoggedIn)
 	http.HandleFunc("/api/sendmessage/", views.SendMessage)
+	http.HandleFunc("/api/getmessage/", views.GetMessage)
 	//Handle favicon.ico
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "static/icon/favicon.ico")

@@ -2,6 +2,7 @@ package dbop
 
 import (
 	"database/sql"
+	"encoding/json"
 	"log"
 	"time"
 )
@@ -46,4 +47,96 @@ func AddMessage(sender, sendee int, content string) string {
 	}
 	_ = tx.Commit()
 	return "M100"
+}
+
+type AllMessages struct {
+	Messages []MessageInfo `json:"messages"`
+}
+
+type MessageInfo struct {
+	Sender     string `json:"sender"`
+	Sendee     string `json:"sendee"`
+	Createtime string `json:"createtime"`
+	Content    string `json:"content"`
+}
+
+// G101 : Cannot connect to DB
+// G102 : SQL statement error
+// G103 : SQL exe error
+// G104 : empty
+// G105 : JSON error
+// G106 : User error
+func GetMessage(sender, sendee int) string {
+	db, err := sql.Open(sqlDriver, userDataPath)
+	if err != nil {
+		log.Print(err)
+		return "G101"
+	}
+	defer func() {
+		_ = db.Close()
+	}()
+	stmt1, err := db.Prepare(`SELECT sender,sendee,createtime,content
+										FROM message 
+										WHERE (sender=? AND sendee=?) OR (sender=? AND sendee=?)`)
+	if err != nil {
+		log.Print(err)
+		return "G102"
+	}
+	defer func() {
+		_ = stmt1.Close()
+	}()
+	rows, err := stmt1.Query(sender, sendee, sendee, sender)
+	if err == sql.ErrNoRows {
+		return "G104"
+	} else if err != nil {
+		log.Print(err)
+		return "G103"
+	}
+	var result AllMessages
+	defer rows.Close()
+	isNotEmpty := false
+	for rows.Next() {
+		isNotEmpty = true
+		var senderRes, sendeeRes int
+		var createtime, content string
+		err = rows.Scan(&senderRes, &sendeeRes, &createtime, &content)
+		if err != nil {
+			log.Print(err)
+			return "Unknown Error"
+		}
+		theSenderName := GetUserName(senderRes)
+		if theSenderName == "@" {
+			return "Unknown Error"
+		} else if theSenderName == "!" {
+			return "G103"
+		}
+		theSendeeName := GetUserName(sendeeRes)
+		if theSendeeName == "@" {
+			return "Unknown Error"
+		} else if theSendeeName == "!" {
+			return "G103"
+		}
+		result.Messages = append(result.Messages,
+			MessageInfo{
+				Sender:     theSenderName,
+				Sendee:     theSendeeName,
+				Createtime: createtime,
+				Content:    content,
+			})
+	}
+	if !isNotEmpty {
+		return "G104"
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Print(err)
+		return "Unknown Error"
+	}
+
+	res, err := json.Marshal(result)
+	if err != nil {
+		log.Print(err)
+		return "G105"
+	}
+	return string(res)
 }
