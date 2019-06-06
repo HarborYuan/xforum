@@ -69,7 +69,7 @@ func GetBoards(w http.ResponseWriter, r *http.Request) {
 }
 
 /*
-	getBoards is a function that handles get boards
+	getResponse is a function that handles get responses
 	{
 		"pid": 1
 	}
