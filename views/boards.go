@@ -74,7 +74,46 @@ func GetBoards(w http.ResponseWriter, r *http.Request) {
 		"pid": 1
 	}
 */
-// return : {"response":[{"uid":3,"createtime":"2019-05-04 19:44:01","content":"附议"},{"uid":4,"createtime":"2019-05-04 19:44:01","content":"反对"}]}
+/*
+return :
+{
+  "uid": 1,
+  "username": "alice",
+  "createtime": "2006-01-02 15:04:05",
+  "content": "我在马路边捡到一分钱",
+  "response": [
+    {
+      "uid": 2,
+      "username": "bob",
+      "createtime": "2006-01-02 15:04:05",
+      "content": "我并不认为你捡过钱"
+    },
+    {
+      "uid": 1,
+      "username": "alice",
+      "createtime": "2006-01-02 15:04:05",
+      "content": "我确确实实捡了钱"
+    },
+    {
+      "uid": 1,
+      "username": "alice",
+      "createtime": "2006-01-02 15:04:05",
+      "content": "我就是捡了钱"
+    }
+  ]
+}
+*/
+//or
+/*
+return :
+{
+  "uid": 1,
+  "username": "alice",
+  "createtime": "2006-01-02 15:04:05",
+  "content": "马上交到警察叔叔手里面",
+  "response": null
+}
+*/
 type JsonGetResponse struct {
 	Pid int `json:"pid"`
 }

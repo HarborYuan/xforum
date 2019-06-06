@@ -162,7 +162,11 @@ type Response struct {
 }
 
 type Responses struct {
-	Response []Response `json:"response"`
+	Uid        int        `json:"uid"`
+	Username   string     `json:"username"`
+	Createtime string     `json:"createtime"`
+	Content    string     `json:"content"`
+	Response   []Response `json:"response"`
 }
 
 // G101 : Cannot connect to DB
@@ -180,6 +184,33 @@ func GetResponse(pid int) string {
 	defer func() {
 		_ = db.Close()
 	}()
+	var result Responses
+	stmtPost, err := db.Prepare(`SELECT uid,createtime,content FROM posts WHERE  id = ?`)
+	if err != nil {
+		log.Print(err)
+		return "G102"
+	}
+	defer func() {
+		_ = stmtPost.Close()
+	}()
+	var uid int
+	var createtime, content string
+	err = stmtPost.QueryRow(pid).Scan(&uid, &createtime, &content)
+	if err != nil {
+		log.Print(err)
+		return "Unkonwn Error"
+	}
+	theUserName := GetUserName(uid)
+	if theUserName == "@" {
+		return "Unknown Error"
+	} else if theUserName == "!" {
+		return "G103"
+	}
+	result.Uid = uid
+	result.Username = theUserName
+	result.Createtime = createtime
+	result.Content = content
+
 	stmtUsername, err := db.Prepare(`SELECT uid,createtime,content  FROM response WHERE pid = ?`)
 	if err != nil {
 		log.Print(err)
@@ -190,12 +221,17 @@ func GetResponse(pid int) string {
 	}()
 	rows, err := stmtUsername.Query(pid)
 	if err == sql.ErrNoRows {
-		return "G104"
+		res, err := json.Marshal(result)
+		if err != nil {
+			log.Print(err)
+			return "G105"
+		}
+		return string(res)
 	} else if err != nil {
 		log.Print(err)
 		return "G103"
 	}
-	var result Responses
+
 	defer rows.Close()
 	isNotEmpty := false
 	for rows.Next() {
@@ -216,7 +252,12 @@ func GetResponse(pid int) string {
 		result.Response = append(result.Response, Response{Uid: uid, Username: theUserName, Createtime: createtime, Content: content})
 	}
 	if !isNotEmpty {
-		return "G104"
+		res, err := json.Marshal(result)
+		if err != nil {
+			log.Print(err)
+			return "G105"
+		}
+		return string(res)
 	}
 	err = rows.Err()
 	if err != nil {
