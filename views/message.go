@@ -138,3 +138,23 @@ func GetMessage(w http.ResponseWriter, r *http.Request) {
 	flag := dbop.GetMessage(useridnow, info.Sendee)
 	_, err = w.Write([]byte(flag))
 }
+
+func GetMesList(w http.ResponseWriter, r *http.Request) {
+	session, err := Store.Get(r, "session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if session.Values["loggedin"] != "true" {
+		_, _ = w.Write([]byte("U200"))
+		return
+	}
+	usernow := fmt.Sprint(session.Values["username"])
+	useridnow := dbop.GetUid(usernow)
+	if useridnow == -1 {
+		_, _ = w.Write([]byte("G106"))
+		return
+	}
+	flag := dbop.GetMesList(useridnow)
+	_, err = w.Write([]byte(flag))
+}

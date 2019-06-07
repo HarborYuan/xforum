@@ -140,3 +140,98 @@ func GetMessage(sender, sendee int) string {
 	}
 	return string(res)
 }
+
+type AllPeople struct {
+	MesList []OnePeople `json:"messages"`
+}
+
+type OnePeople struct {
+	User     string `json:"user"`
+	LastTime string `json:"last_time"`
+}
+
+// G101 : Cannot connect to DB
+// G102 : SQL statement error
+// G103 : SQL exe error
+// G104 : empty
+// G105 : JSON error
+// G106 : User error
+
+func GetMesList(userid int) string {
+	db, err := sql.Open(sqlDriver, userDataPath)
+	if err != nil {
+		log.Print(err)
+		return "G101"
+	}
+	defer func() {
+		_ = db.Close()
+	}()
+	stmt1, err := db.Prepare(`
+SELECT user,MAX(createtime) AS utime
+FROM (
+         SELECT sendee AS user, createtime
+         FROM message
+         WHERE sender = ?
+
+         UNION ALL
+
+         SELECT sender AS user, createtime
+         FROM message
+         WHERE sendee = ?
+     )
+GROUP BY user
+ORDER BY utime DESC;
+`)
+	if err != nil {
+		log.Print(err)
+		return "G102"
+	}
+	defer func() {
+		_ = stmt1.Close()
+	}()
+	rows, err := stmt1.Query(userid, userid)
+	if err == sql.ErrNoRows {
+		return "G104"
+	} else if err != nil {
+		log.Print(err)
+		return "G103"
+	}
+	var result AllPeople
+	defer rows.Close()
+	isNotEmpty := false
+	for rows.Next() {
+		isNotEmpty = true
+		var uid int
+		var lasttime string
+		err = rows.Scan(&uid, &lasttime)
+		if err != nil {
+			log.Print(err)
+			return "Unknown Error"
+		}
+		theSenderName := GetUserName(uid)
+		if theSenderName == "@" {
+			return "Unknown Error"
+		} else if theSenderName == "!" {
+			return "G103"
+		}
+		result.MesList = append(result.MesList,
+			OnePeople{
+				User:     theSenderName,
+				LastTime: lasttime,
+			})
+	}
+	if !isNotEmpty {
+		return "G104"
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Print(err)
+		return "Unknown Error"
+	}
+	res, err := json.Marshal(result)
+	if err != nil {
+		log.Print(err)
+		return "G105"
+	}
+	return string(res)
+}
