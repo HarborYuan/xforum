@@ -2,6 +2,7 @@ package views
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/HarborYuan/xforum/model/dbop"
 	"github.com/gorilla/sessions"
 	"io/ioutil"
@@ -243,4 +244,20 @@ func GetUserDetailInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	flag := dbop.GetUserDetailInfo(info.UID)
 	_, err = w.Write([]byte(flag))
+}
+
+// return your uid
+func GetMyUid(w http.ResponseWriter, r *http.Request) {
+	session, err := Store.Get(r, "session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if session.Values["loggedin"] != "true" {
+		_, _ = w.Write([]byte("U200"))
+		return
+	}
+	usernow := fmt.Sprint(session.Values["username"])
+	useridnow := dbop.GetUid(usernow)
+	_, err = w.Write([]byte(strconv.Itoa(useridnow)))
 }

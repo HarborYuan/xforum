@@ -146,6 +146,7 @@ type AllPeople struct {
 }
 
 type OnePeople struct {
+	Uid      int    `json:"uid"`
 	User     string `json:"user"`
 	LastTime string `json:"last_time"`
 }
@@ -216,6 +217,7 @@ ORDER BY utime DESC;
 		}
 		result.MesList = append(result.MesList,
 			OnePeople{
+				Uid:      uid,
 				User:     theSenderName,
 				LastTime: lasttime,
 			})

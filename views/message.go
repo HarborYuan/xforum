@@ -139,6 +139,23 @@ func GetMessage(w http.ResponseWriter, r *http.Request) {
 	_, err = w.Write([]byte(flag))
 }
 
+/*
+{
+  "messages": [
+    {
+      "uid": 4,
+      "user": "dave",
+      "last_time": "2019-06-07 13:54:58"
+    },
+    {
+      "uid": 2,
+      "user": "bob",
+      "last_time": "2019-06-06 13:54:58"
+    }
+  ]
+}
+*/
+
 func GetMesList(w http.ResponseWriter, r *http.Request) {
 	session, err := Store.Get(r, "session")
 	if err != nil {

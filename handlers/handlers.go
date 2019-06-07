@@ -30,6 +30,7 @@ func Handler() {
 	http.HandleFunc("/api/sendmessage/", views.SendMessage)
 	http.HandleFunc("/api/getmessage/", views.GetMessage)
 	http.HandleFunc("/api/getmeslist/", views.GetMesList)
+	http.HandleFunc("/api/getmyuid/", views.GetMyUid)
 	//Handle favicon.ico
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "static/icon/favicon.ico")
