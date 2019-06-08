@@ -56,6 +56,15 @@ CREATE TABLE response
     createtime TEXT NOT NULL,
     content    TEXT NOT NULL
 );
+
+CREATE TABLE  message
+(
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    sender      INTEGER,
+    sendee      INTEGER,
+    createtime  TEXT NOT NULL,
+    content     TEXT NOT NULL 
+);
 	`
 	_, err = db.Exec(sqlStmt)
 	if err != nil {
