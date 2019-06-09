@@ -198,7 +198,7 @@ func GetResponse(pid int) string {
 	err = stmtPost.QueryRow(pid).Scan(&uid, &createtime, &content)
 	if err != nil {
 		log.Print(err)
-		return "G103"
+		return "G104"
 	}
 	theUserName := GetUserName(uid)
 	if theUserName == "@" {
