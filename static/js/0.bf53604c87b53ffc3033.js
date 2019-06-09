@@ -1,0 +1,2 @@
+webpackJsonp([0],{"46J1":function(e,t,n){"use strict";function r(e){return{name:e+"-stories-view",asyncData:function(t){return t.store.dispatch("FETCH_POST_DATA",{type:e})},render:function(t){return t(a.a,{props:{board:e}})}}}Object.defineProperty(t,"__esModule",{value:!0}),t.default=r;var a=n("xgvL")}});
+//# sourceMappingURL=0.bf53604c87b53ffc3033.js.map
