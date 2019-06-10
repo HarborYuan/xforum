@@ -133,10 +133,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if session.Values["loggedin"] == "true" {
-		_, _ = w.Write([]byte("U200"))
-		return
-	}
+	//if session.Values["loggedin"] == "true" {
+	//	_, _ = w.Write([]byte("U200"))
+	//	return
+	//}
 	var info JsonLogin
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
